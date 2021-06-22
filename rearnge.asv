@@ -1,0 +1,17 @@
+function expstruct = rearnge(structure,rawtrial,avescmat)
+    stleng = length(structure);
+    for i = 1:stleng
+        expstruct(i).session = structure(i).name;
+        expstruct(i).trial = length(structure(i).TRON);
+        expstruct(i).trialtype = avescmat(:,i);
+        
+        triallick = trlck(rawtrial,structure);
+        expstruct(i).totallick = length(triallick{:,i});
+        %expstruct(i).totallick = length(structure(i).LICK);
+        % need trial lick; just drew the whole lick
+        
+        %expstruct(i).licktime = structure(i).LICK;
+        % need trial lick; just drew the whole lick
+    end
+    
+end
