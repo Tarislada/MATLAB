@@ -42,9 +42,9 @@ wronglabel2 = find(arrayfun(@(alldata) alldata.name=="PostPVT3-201022",alldata))
 
 deleteindex = [deleteindex1, deleteindex2, deleteindex3, wronglabel1, wronglabel2];
 alldata(deleteindex) = [];
-%name = "pvtbehav"
+% name = "pvtbehav"
 
-%name = "pst8"
+% name = "pst8"
 % read from line 읽을 수 있는지 확인 - 850초 이하 분석에서 제외
 % video input onset으로 구현 가능할듯?
 %% Data labeling
