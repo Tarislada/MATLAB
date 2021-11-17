@@ -62,12 +62,14 @@ function  [avescmat,ir2atkmat,irnummat, itimat] = avesc(rawtrial, structure)
                 tmplatmat(ii) = NaN;
                 tmpirnummat(ii) = NaN;
             else
-                tmppstavesc(ii) = trir(1)<trat(1);
-                %tmppstavesc(ii) = trir(end)<trat(1);
+                %tmppstavesc(ii) = trir(1)<trat(1);
+                tmppstavesc(ii) = trir(end)<trat(1);
                 % 1 = avoidance, 0 = escape
                 % end로 하면 마지막 withdrawl 기준으로 판단, 1로하면 최초 withdrawl 기준 판단
+                
+                %tmplatmat(ii) = trir(1)-trat(1);
                 tmplatmat(ii) = trir(end)-trat(1);
-                tmplatmat(abs(tmplatmat)>8.5) = NaN;
+                %tmplatmat(abs(tmplatmat)>8.5) = NaN;
                 % <0 avoidance >0 escape
                 tmpirnummat(ii) = length(trir);
                 % 0 = error
@@ -80,4 +82,8 @@ function  [avescmat,ir2atkmat,irnummat, itimat] = avesc(rawtrial, structure)
         irnummat(:,i) = [tmpirnummat; nan((maxtrial - length(tmptr)),1)];
         itimat(:,i) = [tmpitimat; nan((maxtrial - length(tmpitimat)),1)];
     end
+    erridx1 = abs(ir2atkmat)>8.5;
+    ir2atkmat(erridx1) = NaN;
+    erridx2 = ir2atkmat==0;
+    ir2atkmat(erridx2) = NaN;
 end

@@ -9,6 +9,11 @@
 % out shit from it so your asking someone else to do it and you want to
 % delete information yourself? it's either you're stupid or you're
 % incompetent. noting more, noting less.
+% what angers me is that he is trying to bend the rules to his favor to hid
+% his incompetance and stupidity, while trying to make me look so. that is
+% just outrageous. if u can't win, bend the rules to win. Wow! what a
+% thinking! only the most incompetent, most stupid person would think of
+% such things
 
 % name/session type/session date/trial type/trial number/total # of licks/lickdata(1,100)
 function exptxt = rearrange2(structure,rawtrial,avescmat,divind)
@@ -37,11 +42,12 @@ function exptxt = rearrange2(structure,rawtrial,avescmat,divind)
         tmpavesc = avescmat(1:trialnum,i);
         avesc = tmpavesc(1:trialnum);        
         avesc = (avesc-1)*-1;
-        tmpcell(:,5) = mat2cell(avesc,ones(length(avesc),1));
+        avesc(avesc==0)=0;
+        tmpcell(:,6) = mat2cell(avesc,ones(length(avesc),1));
         
         % figuring out total number of licks in trials and marking it      
         totlick = C(1:trialnum,i);
-        tmpcell(:,6) = mat2cell(totlick,ones(length(totlick),1));
+        tmpcell(:,5) = mat2cell(totlick,ones(length(totlick),1));
                 
         % name
         subjectID = string(regexp(structure(i).name,'^(\w+)-','tokens'));        
@@ -54,7 +60,7 @@ function exptxt = rearrange2(structure,rawtrial,avescmat,divind)
         tmpcell(:,7) = newlick;
         
         % session type
-        tmpcell(:,3) = {'R'};
+        tmpcell(:,2) = {'R'};
         
         % session ID
         % which row is this session in a column of trials?
@@ -62,7 +68,7 @@ function exptxt = rearrange2(structure,rawtrial,avescmat,divind)
         tmpsession = diff(divind);
         tmpfun2 = @(x) 1:x;
         sessionID = cell2mat(arrayfun(tmpfun2, tmpsession,'UniformOutput',0))';
-        tmpcell(:,2) = {sessionID(i)};
+        tmpcell(:,3) = {sessionID(i)};
         %tmpcell(:,3) = mat2cell((1:length(workingsession))',ones(length(workingsession),1));    
         
         %% filewrite part

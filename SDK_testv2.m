@@ -1,21 +1,28 @@
-% Initial setup
+%% Extract data from SDK files and orgainize
+%% Initial setup
 
 cd D:\CK-Behav_pvt-200205-175423
 tmplist = dir('D:\CK-Behav_pvt-200205-175423');
-% cd D:\210603
-% tmplist = dir('D:\210603');
+% state the directory of the tank and load 
 %% Collect alldata into one Structure
 for i=3:length(tmplist)-1
     try
         tmpname = strcat(tmplist(i).name(4:end-7));
+        % read the name of the session
         alldata(i-2).name = tmpname;
+        % data name will be the name of session
         tmpdata = TDTbin2mat(tmplist(i).name,'TYPE',{'epocs'});
         alldata(i-2).data = tmpdata.epocs;
+        % using TDT-provided function, read the epocs of the data
     catch EX
         fprintf('Failed data extraction: %s\nErrorcode: %s\n',tmpname,EX.message);
         continue;
+        % in case reading fails, print the failed data name and continue to
+        % next file
     end
 end
+% read all files in the tank and store data into 1 giant structure of data
+% called alldata
 
 %% Delete empty data from structure
 emptyIndex = find(arrayfun(@(alldata) isempty(alldata.data),alldata));
@@ -27,27 +34,41 @@ for ii = 1:length(alldata)
             tooshort = [ii tooshort];
         end
     catch EX
-        %continue;
     end
 end
 alldata(tooshort) = [];
+% detect data with duration too short or empty alltogether, then delete
+% them from the structure
 deleteindex1 = ...
 find(arrayfun(@(alldata) alldata.name(1:end-7)=="PostPVT8",alldata));
 deleteindex2 = ...
 find(arrayfun(@(alldata) alldata.name(1:end-7)=="pvtbehav2",alldata));
 deleteindex3 = ...
 find(arrayfun(@(alldata) alldata.name(1:end-7)=="PostPVT4",alldata));
+deleteindex4 = ...
+find(arrayfun(@(alldata) alldata.name(1:end-7)=="prePVT1",alldata));
+deleteindex5 = ...
+find(arrayfun(@(alldata) alldata.name(1:end-7)=="prePVT3",alldata));
+deleteindex6 = ...
+find(arrayfun(@(alldata) alldata.name(1:end-7)=="PrePVT4",alldata));
+deleteindex7 = ...
+find(arrayfun(@(alldata) alldata.name(1:end-7)=="PostPVT7",alldata));
+deleteindex8 = ...
+find(arrayfun(@(alldata) alldata.name(1:end-7)=="PostPVT9",alldata));
+deleteindex9 = ...
+find(arrayfun(@(alldata) alldata.name(1:end-7)=="PostPVT10",alldata));
+
+
 wronglabel1 = find(arrayfun(@(alldata) alldata.name=="PostPVT1-201022",alldata));
 wronglabel2 = find(arrayfun(@(alldata) alldata.name=="PostPVT3-201022",alldata));
 
-deleteindex = [deleteindex1, deleteindex2, deleteindex3, wronglabel1, wronglabel2];
-alldata(deleteindex) = [];
-% name = "pvtbehav"
+% custom delete indices with errors or deaths, and ones labled wrong
 
-% name = "pst8"
-% read from line 읽을 수 있는지 확인 - 850초 이하 분석에서 제외
-% video input onset으로 구현 가능할듯?
-%% Data labeling
+deleteindex = [deleteindex1, deleteindex2, deleteindex3,deleteindex4,deleteindex5,deleteindex6,deleteindex7,deleteindex8,deleteindex9, wronglabel1, wronglabel2];
+alldata(deleteindex) = [];
+% delete custom delete indices
+
+%% Data labeling -  which stage of the experiment
 % label alldata - robot, shuttle, train
 % train - X attack, less than 7(?) trials
 % shuttle - X attack
@@ -56,26 +77,30 @@ for i = 1:length(alldata)
     try
         if isfield(alldata(i).data,'ATTK')
             alldata(i).label = "robot";
+            % if there is an attack, its a robot session
         elseif length(alldata(i).data.TRON.onset) >7
             alldata(i).label = "shuttle";
+            % if there is no attack, but the more then 7 trials, its
+            % shuttling
         else 
             alldata(i).label = "train";
+            % anything else will be sucrose training
         end
     catch
         alldata(i).label = "train";
         continue;
     end
-    
 end
 alldata(3).label = "train";
 % ? fix this are u mad?
 alldata(arrayfun(@(alldata) alldata.name=="PostPVT6-201023",alldata)).label = "shuttle";
-%alldata(arrayfun(@(alldata) alldata.name=="PostPVT7-201216",alldata)).label = "shuttle";
- 
-alldata(arrayfun(@(alldata) alldata.name=="PostPVT10-201217",alldata)).label = "shuttle";
-alldata(arrayfun(@(alldata) alldata.name=="PrePVT4-200813",alldata)).label = "robot";
-alldata(arrayfun(@(alldata) alldata.name=="PrePVT4-200821",alldata)).label = "robot";
+%alldata(arrayfun(@(alldata) alldata.name=="PostPVT10-201217",alldata)).label = "shuttle";
+%alldata(arrayfun(@(alldata) alldata.name=="PrePVT4-200813",alldata)).label = "robot";
+%alldata(arrayfun(@(alldata) alldata.name=="PrePVT4-200821",alldata)).label = "robot";
 alldata(arrayfun(@(alldata) alldata.name=="PrePVT9-210128",alldata)).label = "robot";
+% custom labels that the experimenter is aware of, and is an exception to
+% above classification
+
 %% Seperate & refine dataset
 tmprobotdata = struct([]);
 tmpshuttledata = struct([]);
@@ -266,6 +291,7 @@ for i = 1:length(tmptraindata)
     end
 end
 clear tmprobotdata tmpshuttledata tmptraindata
+
 %% Label all 3 datasets
 for i = 1:length(robotdata)
     robotdata(i).label = robotdata(i).name(1:4);

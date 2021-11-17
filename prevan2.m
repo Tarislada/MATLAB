@@ -23,12 +23,14 @@ for i = 1:length(targetarray)
     tmpneg = diffvec(negidx);
     tmppos = diffvec(posidx);
   
-    %if  length(posidx) + length(negidx) > 20
+    if  length(posidx) + length(negidx) <= 23
+         %trial 수에 따라 분석 여부 결정
         neg = [neg; tmpneg];
         pos = [pos; tmppos];
-    %end
+    end
+   
     
 end
 end
 %평균내지 말고, rawdata그대로 추출해서 통계돌려보자
-%trial 수 20이하만 분석
+
